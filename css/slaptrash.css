@@ -1,0 +1,104 @@
+body {
+  font-family: sans-serif;
+}
+.slaptrash {
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.slaptrash > div {
+  position: absolute;
+  display: table;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.slaptrash > div > div {
+  display: table-cell;
+  vertical-align: middle;
+}
+.slaptrash div.solid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.slaptrash img {
+  min-width: 100%;
+  min-height: 100%;
+}
+.slaptrash div.DIV,
+.slaptrash div.P,
+.slaptrash div.H1,
+.slaptrash div.H2,
+.slaptrash div.H3,
+.slaptrash div.H4,
+.slaptrash div.H5,
+.slaptrash div.H6 {
+  padding: 24px;
+}
+.slaptrash img,
+.slaptrash div.H1,
+.slaptrash div.H2,
+.slaptrash div.H3,
+.slaptrash div.H4,
+.slaptrash div.H5,
+.slaptrash div.H6 {
+  text-align: center;
+}
+.slaptrash div.DIV,
+.slaptrash div.P {
+  font-size: 40px;
+}
+.slaptrash div.H1 {
+  font-size: 92px;
+}
+.slaptrash div.H2 {
+  font-size: 80px;
+}
+.slaptrash div.H3 {
+  font-size: 68px;
+}
+.slaptrash div.H4 {
+  font-size: 50px;
+}
+.slaptrash div.H5 {
+  font-size: 30px;
+}
+.slaptrash div.H6 {
+  font-size: 14px;
+}
+.slaptrash iframe.SOUND {
+  height: 1px;
+}
+
+//
+// Animations
+//
+@keyframes slapanimtrail {
+  0% { transform:translateY(50%) scale(0); }
+  50% { transform:translateY(-20%) scale(0.7); }
+  100% { transform:translateY(0%) scale(1.0); }
+}
+
+@keyframes slapanimspin {
+  0% { transform:rotate(0) scale(0); }
+  50% { transform:rotate(360deg) scale(1.0); }
+  100% { transform:rotate(720deg) scale(0); }
+}
+
+@keyframes slapanimerratic {
+  0% { transform:rotate(0) scale(1); }
+  20% { transform:rotate(1deg) scale(1); }
+  40% { transform:rotate(0deg) scale(1.03); }
+  60% { transform:rotate(3deg) scale(0.97); }
+  80% { transform:rotate(0deg) scale(1.03); }
+  100% { transform:rotate(1deg) scale(0.97); }
+}
