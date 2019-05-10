@@ -171,6 +171,7 @@ function slapscript(src) {
   var s = document.createElement("script")
   s.src = src
   document.head.appendChild(s)
+  return s
 }
 
 function slapstyle(src) {
@@ -178,6 +179,7 @@ function slapstyle(src) {
   s.rel = "stylesheet"
   s.href = src
   document.head.appendChild(s)
+  return s
 }
 
 function slaptrash(div) {
@@ -523,9 +525,10 @@ function ready(fn) {
   document.addEventListener('DOMContentLoaded', fn)
 }
 
-slapscript('https://cdn.jsdelivr.net/npm/umbrellajs')
 slapstyle('https://kickscondor.github.io/css/slaptrash.css')
-ready(function () {
-  u('.slaptrash').each(slaptrash).each(slapplay)
-  setInterval(slapframe, 50)
-})
+slapscript('https://cdn.jsdelivr.net/npm/umbrellajs').onload = function () {
+  ready(function () {
+    u('.slaptrash').each(slaptrash).each(slapplay)
+    setInterval(slapframe, 50)
+  })
+}
