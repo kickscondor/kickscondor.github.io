@@ -167,9 +167,10 @@ var SLAPSHOWS = {}, SLAPANIMS = []
 var SLAPANIM_WAIT = 0
 var SLAPANIM_TEXT = 100
 
-function slapscript(src) {
+function slapscript(src, fn) {
   var s = document.createElement("script")
   s.src = src
+  if (fn) s.onload = fn
   document.head.appendChild(s)
   return s
 }
@@ -526,9 +527,9 @@ function ready(fn) {
 }
 
 slapstyle('https://kickscondor.github.io/css/slaptrash.css')
-slapscript('https://cdn.jsdelivr.net/npm/umbrellajs').onload = function () {
+slapscript('https://cdn.jsdelivr.net/npm/umbrellajs', function () {
   ready(function () {
     u('.slaptrash').each(slaptrash).each(slapplay)
     setInterval(slapframe, 50)
   })
-}
+})
