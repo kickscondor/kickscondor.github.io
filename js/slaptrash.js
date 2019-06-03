@@ -318,7 +318,7 @@ function slaptwitch(dim, m, ele) {
     'gyroscope; picture-in-picture" allowfullscreen></iframe>'
 }
 
-function slaptwitchchat(dim, m, ele) {
+function slaptwitchchat(m, ele) {
   var url = 'https://www.twitch.tv/embed/' + m[7] + '/chat'
 
   return '<iframe class="' + ele.type + '" ' +
@@ -425,9 +425,9 @@ function slapplay(div, advance) {
         }
       break
       case "CHAT":
-        var base = ele.html.innerText
+        var base = ele.html.innerText, m = null
         if (m = base.match(SLAPSHOW_TWITCH)) {
-          cr = u(slaptwitchchat(ele))
+          cr = u(slaptwitchchat(m, ele))
         }
       break
       case "CARD":
