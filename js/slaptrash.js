@@ -299,9 +299,6 @@ function slaptwitchtime(str) {
 function slaptwitch(dim, m, ele) {
   var url = 'https://player.twitch.tv/?channel=' + m[7]
   switch (m[5]) {
-    case "chat":
-      url = 'https://www.twitch.tv/embed/' + m[6] + '/chat'
-    break
     case "clip":
       url = 'https://clips.twitch.tv/embed?clip=' + m[6] 
     break
@@ -321,6 +318,13 @@ function slaptwitch(dim, m, ele) {
     'gyroscope; picture-in-picture" allowfullscreen></iframe>'
 }
 
+function slaptwitchchat(dim, m, ele) {
+  var url = 'https://www.twitch.tv/embed/' + m[7] + '/chat'
+
+  return '<iframe class="' + ele.type + '" ' +
+    'src="' + url + '" ' + dim + 'frameborder="0" scrolling="no"></iframe>'
+}
+
 function slapcolor(color, attr, add) {
   if (!color) return ''
   var style = (attr ? ' style="' : '') + 'background: '
@@ -335,7 +339,7 @@ function slapcolor(color, attr, add) {
 
 var SLAPSHOW_IMGUR = /^(https?:\/\/)?(\w+\.)?imgur\.com\/(\w+)(\.\w+)?$/
 var SLAPSHOW_YOUTUBE = /^(https?:\/\/)?(\w+\.)?(youtube\.com\/.+v=([\w\-]+)|youtu\.be\/([\w\-]+))/
-var SLAPSHOW_TWITCH = /^(https?:\/\/)?(\w+\.)?twitch\.tv((\/|\/.+\/)(clip|videos|collections|chat)\/(\w+)|\/(\w+))/
+var SLAPSHOW_TWITCH = /^(https?:\/\/)?(\w+\.)?twitch\.tv((\/|\/.+\/)(clip|videos|collections)\/(\w+)|\/(\w+))/
 var SLAPSHOW_TILE = /^(\d+)x(\d+)$/
 
 function slapplay(div, advance) {
@@ -418,6 +422,12 @@ function slapplay(div, advance) {
             (m[4] ? m[4] : '.jpg') + '" />')
         } else {
           cr = u('<img src="' + base + '" />')
+        }
+      break
+      case "CHAT":
+        var base = ele.html.innerText, m = null, dim = slapdim(div, tiles)
+        if (m = base.match(SLAPSHOW_TWITCH)) {
+          cr = u(slaptwitchchat(dim, m, ele))
         }
       break
       case "CARD":
