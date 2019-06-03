@@ -206,7 +206,7 @@ function slaptrash(div) {
       script[script.length - 1].layers.push(props)
     }
   }).remove()
-  show.append("<div class='overlay'></div>")
+  show.append("<div class='overlay'><div class='START'></div></div>")
 
   show.on('click', function (ev) {
     slapplay(div, true)
