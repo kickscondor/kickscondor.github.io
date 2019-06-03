@@ -322,7 +322,7 @@ function slaptwitchchat(dim, m, ele) {
   var url = 'https://www.twitch.tv/embed/' + m[7] + '/chat'
 
   return '<iframe class="' + ele.type + '" ' +
-    'src="' + url + '" ' + dim + 'frameborder="0" scrolling="no"></iframe>'
+    'src="' + url + '" frameborder="0" scrolling="no"></iframe>'
 }
 
 function slapcolor(color, attr, add) {
@@ -425,9 +425,9 @@ function slapplay(div, advance) {
         }
       break
       case "CHAT":
-        var base = ele.html.innerText, m = null, dim = slapdim(div, tiles)
+        var base = ele.html.innerText
         if (m = base.match(SLAPSHOW_TWITCH)) {
-          cr = u(slaptwitchchat(dim, m, ele))
+          cr = u(slaptwitchchat(ele))
         }
       break
       case "CARD":
