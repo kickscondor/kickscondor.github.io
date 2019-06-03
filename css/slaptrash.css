@@ -76,7 +76,19 @@ body {
   font-size: 14px;
 }
 .slaptrash iframe.SOUND {
-  height: 1px;
+  width: 0px;
+  height: 0px;
+}
+.slaptrash div.START {
+  height: 72px;
+  width: 72px;
+  left: 50%;
+  top: 50%;
+  margin-left: -36px;
+  margin-top: -36px;
+  position: absolute;
+  background: url("https://kickscondor.github.io/images/TxzC70f.png") no-repeat;
+  cursor: pointer;
 }
 
 //
