@@ -206,7 +206,7 @@ function slaptrash(div) {
       script[script.length - 1].layers.push(props)
     }
   }).remove()
-  show.append("<div class='overlay'><div class='START'></div></div>")
+  show.append("<div class='overlay'><div class='TIMER'></div><div class='START'></div></div>")
 
   show.on('click', function (ev) {
     slapplay(div, true)
@@ -318,14 +318,6 @@ function slaptwitch(dim, m, ele) {
     'gyroscope; picture-in-picture" allowfullscreen></iframe>'
 }
 
-function slaptwitchchat(m, ele) {
-  var url = 'https://www.twitch.tv/embed/' + m[7] + '/chat'
-
-  return '<iframe class="' + ele.type + '" ' +
-    'src="' + url + '" frameborder="0" id="chat_embed" scrolling="no" ' +
-    'width="100%" height="100%"></iframe>'
-}
-
 function slapcolor(color, attr, add) {
   if (!color) return ''
   var style = (attr ? ' style="' : '') + 'background: '
@@ -387,7 +379,7 @@ function slapplay(div, advance) {
     }
   }
 
-  udiv.attr('style', 'height: 100%; width: 0;')
+  $('.TIMER', udiv).attr('style', 'height: 100%; width: 0;')
   page.layers.forEach(function (ele) {
     var cr = null
     switch (ele.type) {
@@ -423,12 +415,6 @@ function slapplay(div, advance) {
             (m[4] ? m[4] : '.jpg') + '" />')
         } else {
           cr = u('<img src="' + base + '" />')
-        }
-      break
-      case "CHAT":
-        var base = ele.html.innerText, m = null
-        if (m = base.match(SLAPSHOW_TWITCH)) {
-          cr = u(slaptwitchchat(m, ele))
         }
       break
       case "CARD":
@@ -514,7 +500,7 @@ function slapframe() {
           slapplay(anim[3], true)
         } else {
           anim[1]++
-          u('.overlay', anim[3]).attr('style', 'height: 20px; width: ' +
+          u('.overlay > .timer', anim[3]).attr('style', 'height: 20px; width: ' +
             Math.ceil((anim[1] / anim[2]) * 100) + '%;' + anim[4])
         }
       break;
