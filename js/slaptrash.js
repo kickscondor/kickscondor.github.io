@@ -322,7 +322,8 @@ function slaptwitchchat(m, ele) {
   var url = 'https://www.twitch.tv/embed/' + m[7] + '/chat'
 
   return '<iframe class="' + ele.type + '" ' +
-    'src="' + url + '" frameborder="0" scrolling="no"></iframe>'
+    'src="' + url + '" frameborder="0" id="chat_embed" scrolling="no" ' +
+    'width="100%" height="100%"></iframe>'
 }
 
 function slapcolor(color, attr, add) {
