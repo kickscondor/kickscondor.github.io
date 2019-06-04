@@ -8,7 +8,6 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  cursor: pointer;
 }
 .slaptrash > div {
   position: absolute;
@@ -80,7 +79,21 @@ body {
   width: 0px;
   height: 0px;
 }
+.slaptrash div.TIMER {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 0%;
+}
 .slaptrash div.START {
+  display: none;
+}
+.slaptrash .paused {
+  background-color: rgba(0, 0, 0, .4);
+}
+.slaptrash .paused div.START {
+  display: block;
   height: 72px;
   width: 72px;
   left: 50%;
@@ -89,7 +102,13 @@ body {
   margin-top: -36px;
   position: absolute;
   background: url("https://kickscondor.github.io/images/TxzC70f.png") no-repeat;
+}
+.slaptrash > div.overlay {
+  pointer-events: auto;
   cursor: pointer;
+}
+.slaptrash > div.stopped {
+  cursor: default !important;
 }
 
 //

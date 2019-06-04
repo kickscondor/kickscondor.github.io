@@ -163,7 +163,7 @@ function substring (string, start, width) {
 //
 // Surfshow parsing
 //
-var SLAPSHOWS = {}, SLAPANIMS = []
+var SLAPSHOWS = {}
 var SLAPANIM_WAIT = 0
 var SLAPANIM_TEXT = 100
 
@@ -184,10 +184,10 @@ function slapstyle(src) {
 }
 
 function slaptrash(div) {
-  var show = u(div)
+  var st = u(div)
   var script = [{layers: []}]
 
-  show.children().each(function (ele) {
+  st.children().each(function (ele) {
     var props = {}
     if (ele.hasAttributes()) {
       var attrs = ele.attributes
@@ -206,13 +206,33 @@ function slaptrash(div) {
       script[script.length - 1].layers.push(props)
     }
   }).remove()
-  show.append("<div class='overlay'><div class='TIMER'></div><div class='START'></div></div>")
+  var overlay = u("<div class='overlay paused'><div class='TIMER'></div><div class='START'></div></div>")
+  st.append(overlay)
 
-  show.on('click', function (ev) {
-    slapplay(div, true)
+  var show = {page: 0, script: script, stack: [], history: [], timer: null,
+    anims: [], starts: [], stage: 0}
+
+  st.on('click', function (ev) {
+    switch (show.stage) {
+      case 0:
+			show.starts.forEach(function (s) {
+				if (typeof s.command !== 'undefined') {
+					s.command('play')
+				}
+			})
+			show.starts = []
+			show.timer = setInterval(function () { slapframe(show) }, 50)
+			overlay.removeClass('paused')
+			show.stage++
+      break
+
+      case 1:
+      slapplay(div, true)
+      break
+    }
   })
 
-  SLAPSHOWS[div] = {page: 0, script: script, stack: [], history: []}
+  SLAPSHOWS[div] = show
 }
 
 function slapsay(hdr, phrase) {
@@ -251,16 +271,21 @@ function slapdim(div, tiles) {
       dim[0] = ((w - dim[2]) * 0.5)
     }
   }
-  return ' style="position: absolute; left: ' + dim[0] + 'px;' +
+  return dim
+}
+
+function dim2style(dim) {
+  return (dim ? ' style="position: absolute; left: ' + dim[0] + 'px;' +
     'top: ' + dim[1] + 'px;' + 'width: ' + dim[2] + 'px;' +
-    'height: ' + dim[3] + 'px;"'
+    'height: ' + dim[3] + 'px;"' : '')
 }
 
 function slapimgur(dim, tiles, m, ele) {
-  return '<video onloadeddata="this.play()" poster="//i.imgur.com/' + m[3] + '.jpg"' +
+  return u('<video poster="//i.imgur.com/' + m[3] + '.jpg"' +
+    (autoplay ? ' onloadeddata="this.play()" ' : '') +
     dim + 
     ' muted playsinline loop><source src="//i.imgur.com/' + m[3] + '.mp4" type="video/mp4">' +
-    '<source src="//i.imgur.com/' + m[3] + '.webm" type="video/webm"></video>'
+    '<source src="//i.imgur.com/' + m[3] + '.webm" type="video/webm"></video>')
 }
 
 function slapcard(dim, url, ele) {
@@ -274,17 +299,31 @@ function slapcard(dim, url, ele) {
      s.parentNode.insertBefore(e, s);
    }
   })(window, document);
-  return '<a href="' + url + '" class="embedly-card"></a>'
+  return u('<a href="' + url + '" class="embedly-card"></a>')
 }
 
-function slapyt(dim, m, ele) {
-  return '<iframe class="' + ele.type + '" ' +
+function slapyt(dim, m, ele, autoplay) {
+  var obj = u('<iframe class="' + ele.type + '" ' +
     'src="https://www.youtube.com/embed/' + (m[4] || m[5]) +
-    '?autoplay=1&rel=0&loop=1&controls=0&iv_load_policy=3&modestbranding=1' +
+    '?rel=0&loop=1&controls=0&iv_load_policy=3&modestbranding=1&enablejsapi=1' +
+    (autoplay ? '&autoplay=1' : '') +
     (ele.mute === "true" ? '&mute=1' : '') +
     (ele.start ? '&start=' + slaptime(ele.start) : '') +
-    '" ' + dim + 'frameborder="0" allow="accelerometer; autoplay; encrypted-media; ' +
-    'gyroscope; picture-in-picture" allowfullscreen></iframe>'
+    '" ' + dim2style(dim) + 'frameborder="0" allow="accelerometer; encrypted-media; autoplay; ' +
+    'gyroscope; picture-in-picture" allowfullscreen></iframe>')
+  obj.command = function (name) {
+    var action = null
+    switch (name) {
+      case "play":
+        action = 'playVideo'
+      break
+    }
+    if (action) {
+      var cmd = JSON.stringify({event: "command", func: action, args: ''})
+      obj.first().contentWindow.postMessage(cmd, '*')
+    }
+  }
+  return obj
 }
 
 function slaptwitchtime(str) {
@@ -296,7 +335,7 @@ function slaptwitchtime(str) {
   return at
 }
 
-function slaptwitch(dim, m, ele) {
+function slaptwitch(dim, m, ele, autoplay) {
   var url = 'https://player.twitch.tv/?channel=' + m[7]
   switch (m[5]) {
     case "clip":
@@ -310,12 +349,17 @@ function slaptwitch(dim, m, ele) {
     break
   }
 
-  return '<iframe class="' + ele.type + '" ' +
-    'src="' + url + '&autoplay=true' +
-    (ele.mute === "true" ? '&mute=true' : '') +
+  var obj = u('<iframe class="' + ele.type + '" ' +
+    'src="' + url + '&allowfullscreen&origin=' + encodeURIComponent(parent.location.origin) +
+    '&autoplay=' + (autoplay ? 'true' : 'false') +
+    (ele.mute === "true" ? '&muted=true' : '') +
     (ele.start ? '&time=' + slaptwitchtime(ele.start) : '') +
-    '" ' + dim + 'frameborder="0" scrolling="no" allow="accelerometer; autoplay; encrypted-media; ' +
-    'gyroscope; picture-in-picture" allowfullscreen></iframe>'
+    '" ' + dim2style(dim) + 'frameborder="0" scrolling="no" allow="accelerometer; ' +
+    'autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>')
+  obj.command = function (name) {
+    obj.first().contentWindow.postMessage({namespace: 'player.embed.host', method: name}, '*')
+  }
+  return obj
 }
 
 function slapcolor(color, attr, add) {
@@ -362,11 +406,11 @@ function slapplay(div, advance) {
     show.page++
   }
 
-  for (var i = SLAPANIMS.length - 1; i >= 0; i--) {
-    var anim = SLAPANIMS[i]
+  for (var i = show.anims.length - 1; i >= 0; i--) {
+    var anim = show.anims[i]
     switch (anim[0]) {
       case SLAPANIM_WAIT:
-        SLAPANIMS.splice(i, 1)
+        show.anims.splice(i, 1)
       break;
     }
   }
@@ -374,12 +418,15 @@ function slapplay(div, advance) {
   page = show.script[show.page]
   if (page.br) {
     if (page.br.time) {
-      SLAPANIMS.push([SLAPANIM_WAIT, 0, slaptime(page.br.time) * 20, div,
+      show.anims.unshift([SLAPANIM_WAIT, 0, slaptime(page.br.time) * 20, div,
         slapcolor(page.br.color || "yellow", false)]) 
     }
+  } else {
+    udiv.addClass('stopped')
+    show.stage = 2
   }
 
-  $('.TIMER', udiv).attr('style', 'height: 100%; width: 0;')
+  u('.TIMER', udiv.first()).attr('style', 'height: 20px; width: 0;')
   page.layers.forEach(function (ele) {
     var cr = null
     switch (ele.type) {
@@ -404,9 +451,7 @@ function slapplay(div, advance) {
         cr = u('<div class="' + ele.type + '"' + style + '></div>')
         var txt = ele.html.innerText
         var len = runes(txt).length
-        SLAPANIMS.push([SLAPANIM_TEXT, cr, ele, 0, len / 12, len]) 
-        if (ele.mute !== "true")
-          slapsay(ele.type, txt)
+        show.anims.unshift([SLAPANIM_TEXT, cr, ele, 0, len / 12, len, txt]) 
       break
       case "PIC":
         var base = ele.html.innerText, m = null
@@ -419,7 +464,7 @@ function slapplay(div, advance) {
       break
       case "CARD":
         var dim = slapdim(div, tiles)
-        cr = u(slapcard(dim, ele.html.innerText, ele))
+        cr = slapcard(dim, ele.html.innerText, ele)
 			break
       case "SOUND":
       case "VID":
@@ -428,12 +473,14 @@ function slapplay(div, advance) {
           dim = slapdim(div, tiles)
         }
         if (m = base.match(SLAPSHOW_YOUTUBE)) {
-          cr = u(slapyt(dim, m, ele))
+          cr = slapyt(dim, m, ele, advance)
         } else if (m = base.match(SLAPSHOW_TWITCH)) {
-          cr = u(slaptwitch(dim, m, ele))
+          cr = slaptwitch(dim, m, ele, advance)
         } else if (m = base.match(SLAPSHOW_IMGUR)) {
-          cr = u(slapimgur(dim, m, ele))
+          cr = slapimgur(dim, m, ele, advance)
         }
+        if (!advance)
+          show.starts.push(cr)
       break
     }
 
@@ -490,27 +537,33 @@ function slaptext(childs, max) {
   return [html, max]
 }
 
-function slapframe() {
-  for (var i = SLAPANIMS.length - 1; i >= 0; i--) {
-    var anim = SLAPANIMS[i]
+function slapframe(show) {
+  var textframe = false
+  for (var i = show.anims.length - 1; i >= 0; i--) {
+    var anim = show.anims[i]
     switch (anim[0]) {
       case SLAPANIM_WAIT:
         if (anim[1] >= anim[2]) {
-          SLAPANIMS.splice(i, 1)
+          show.anims.splice(i, 1)
           slapplay(anim[3], true)
         } else {
           anim[1]++
-          u('.overlay > .timer', anim[3]).attr('style', 'height: 20px; width: ' +
+          u('.overlay > .TIMER', anim[3]).attr('style', 'height: 20px; width: ' +
             Math.ceil((anim[1] / anim[2]) * 100) + '%;' + anim[4])
         }
       break;
       case SLAPANIM_TEXT:
-        if (anim[3] >= anim[5]) {
-          SLAPANIMS.splice(i, 1)
-        } else {
-          var chars = anim[3] += anim[4]
-          anim[1].html(slaptext(anim[2].html.childNodes, chars)[0])
-        }
+        if (!textframe) {
+					if (anim[3] >= anim[5]) {
+						show.anims.splice(i, 1)
+					} else {
+						if (anim[3] == 0 && anim[2].mute !== "true")
+							slapsay(anim[2].type, anim[6])
+						var chars = anim[3] += anim[4]
+						anim[1].html(slaptext(anim[2].html.childNodes, chars)[0])
+					}
+          textframe = true
+				}
       break
     }
   }
@@ -530,6 +583,5 @@ slapstyle('https://kickscondor.github.io/css/slaptrash.css')
 slapscript('https://cdn.jsdelivr.net/npm/umbrellajs', function () {
   ready(function () {
     u('.slaptrash').each(slaptrash).each(slapplay)
-    setInterval(slapframe, 50)
   })
 })
