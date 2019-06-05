@@ -257,19 +257,17 @@ function slaptime(desc) {
   return secs
 }
 
-function slapdim(div, tiles) {
+function slapdim(tiles) {
   var dim = [0, 0, 1, 1]
-  if (div) {
-    var w = div.offsetWidth * (tiles ? (1 / tiles[1]) : 1),
-        h = div.offsetHeight * (tiles ? (1 / tiles[2]) : 1)
-    dim = [0, 0, w, h]
-    if (dim[0] > dim[1] * (16.0 / 9.0)) {
-      dim[3] = Math.ceil(dim[2] / (16.0 / 9.0))
-      dim[1] = ((h - dim[3]) * 0.5)
-    } else {
-      dim[2] = Math.ceil(dim[3] * (16.0 / 9.0))
-      dim[0] = ((w - dim[2]) * 0.5)
-    }
+  var w = window.innerWidth * (tiles ? (1 / tiles[1]) : 1),
+      h = window.innerHeight * (tiles ? (1 / tiles[2]) : 1)
+  dim = [0, 0, w, h]
+  if (dim[0] > dim[1] * (16.0 / 9.0)) {
+    dim[3] = Math.ceil(dim[2] / (16.0 / 9.0))
+    dim[1] = ((h - dim[3]) * 0.5)
+  } else {
+    dim[2] = Math.ceil(dim[3] * (16.0 / 9.0))
+    dim[0] = ((w - dim[2]) * 0.5)
   }
   return dim
 }
@@ -463,14 +461,14 @@ function slapplay(div, advance) {
         }
       break
       case "CARD":
-        var dim = slapdim(div, tiles)
+        var dim = slapdim(tiles)
         cr = slapcard(dim, ele.html.innerText, ele)
 			break
       case "SOUND":
       case "VID":
         var base = ele.html.innerText, m = null, dim = null
         if (ele.type != "SOUND") {
-          dim = slapdim(div, tiles)
+          dim = slapdim(tiles)
         }
         if (m = base.match(SLAPSHOW_YOUTUBE)) {
           cr = slapyt(dim, m, ele, advance)
