@@ -306,7 +306,7 @@ function slapyt(dim, m, ele, autoplay) {
   var obj = u('<iframe class="' + ele.type + '" ' +
     'src="https://www.youtube.com/embed/' + (m[4] || m[5]) +
     '?rel=0&loop=1&controls=0&iv_load_policy=3&modestbranding=1&enablejsapi=1' +
-    (autoplay ? '&autoplay=1' : '') +
+    (autoplay ? '&autoplay=1' : '') + '&playsinline=1' +
     (ele.mute === "true" ? '&mute=1' : '') +
     (ele.start ? '&start=' + slaptime(ele.start) : '') +
     '" ' + dim2style(dim) + 'frameborder="0" allow="accelerometer; encrypted-media; autoplay; ' +
